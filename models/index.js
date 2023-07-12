@@ -1,17 +1,24 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize, DataTypes, Model } = require("sequelize");
 
 const sequelize = new Sequelize("employeedb", "root", "", {
   host: "localhost",
-  dialect:
-    "mysql" /* one of  | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */,
+  logging: false,
+  dialect: "mysql" /* one of "mysql" | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */
 });
 
 try {
-   sequelize.authenticate();
+  sequelize.authenticate();
   console.log("Connection has been established successfully.");
 } catch (error) {
   console.error("Unable to connect to the database:", error);
 }
 
+const db = {};
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
 
-module.exports = sequelize;
+db.user = require("./user")(sequelize, DataTypes, Model);
+db.contact = require("./contact")(sequelize, DataTypes);
+db.sequelize.sync({ force: false });
+
+module.exports = db;
